@@ -11,9 +11,9 @@ cgaus: -lncurses ${OBJ}
 ${OBJ}: %.o: %.c
 	${CC} -c ${CFLAGS} -o $@ $<
 
-${OBJ}: cgaus.h
+${OBJ}: cgaus.h cgmat.h
 
 clean:
-	rm -f ${OBJ}
+	rm -f ${OBJ} cgaus
 
 .PHONY: all clean	

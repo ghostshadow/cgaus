@@ -1,4 +1,5 @@
 #include "cgmat.h"
-#include <curses.h>
 
+void sif_get_mat(void*);
+void sif_print_mat(void*);
 /* ... */

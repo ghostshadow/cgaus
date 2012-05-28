@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void sif_get_mat(void* mat) {
+void sif_get_mat(mxp mat) {
 	int c,r;
 	double tmp;
 	printf("Input matrix size (<columns>x<rows>): ");
@@ -18,7 +18,7 @@ void sif_get_mat(void* mat) {
 	putchar('\n');
 }
 
-void sif_print_mat(void* mat) {
+void sif_print_mat(mxp mat) {
 	for(int rt=0;rt<mat_get_row(mat);rt++) {
 		for(int ct=0;ct<mat_get_col(mat);ct++) {
 			printf("%lf ",mat_get_val(mat,ct,rt));

@@ -23,14 +23,14 @@ int mat_get_row(mxp mat) {return mat->row;}
  * multiplies every number in a line of the length col with fact
  */
 static void mat_mull(double* line,int col,double fact) {
-	for(int ct=0;ct<col;ct++) *(line+ct)*=fact;
+	for(int ct=0;ct<col;ct++) line[ct]*=fact;
 }
 
 /*
  * adds to each number in a line of the length col the specific number in the second equaly length line
  */
 static void mat_addl(double* tline,int col,double* sline) {
-	for(int ct=0;ct<col;ct++) *(tline+ct)+=*(sline+ct);
+	for(int ct=0;ct<col;ct++) tline[ct]+=sline[ct];
 }
 
 /*
@@ -39,13 +39,13 @@ static void mat_addl(double* tline,int col,double* sline) {
  * if no matching line is found return 0
  */
 static int mat_swapl(mxp mat,int spos) {
-	if(*(*((mat->val)+spos-1)+spos-1)!=0) ; /*err?!*/
-	double* tmpp=*((mat->val)+spos-1);
+	if((mat->val)[spos-1][spos-1]!=0) ; /*err?!*/
+	double* tmpp=(mat->val)[spos-1];
 	for(int rt=spos;rt<(mat->row);rt++) {
-		if(*(*((mat->val)+rt)+spos-1)==0)
+		if((mat->val)[rt][spos-1]==0)
 			continue;
-		*((mat->val)+spos-1)=*((mat->val)+rt);
-		*((mat->val)+rt)=tmpp;
+		(mat->val)[spos-1]=(mat->val)[rt];
+		(mat->val)[rt]=tmpp;
 		return 1;
 	}
 	return 0;
@@ -57,26 +57,26 @@ static int mat_swapl(mxp mat,int spos) {
  */
 static mxp mat_solve_norm(mxp mat) {
 	for(int rt=0;rt<(mat->col)-1;rt++) {
-		if(*(*((mat->val)+rt)+rt)==0) 
+		if((mat->val)[rt][rt]==0) 
 			if(!mat_swapl(mat,rt+1)) 
 				continue;
-		mat_mull(*((mat->val)+rt),(mat->col),-1/(*(*((mat->val)+rt)+rt)));
+		mat_mull((mat->val)[rt],mat->col,-1/(mat->val)[rt][rt]);
 		double* tmp=malloc((mat->col)*sizeof(double));
 		for(int rt2=rt+1;rt2<(mat->row);rt2++) {
-			memcpy(tmp,*((mat->val)+rt),(mat->col));
-			mat_mull(tmp,(mat->col),*(*((mat->val)+rt2)+rt));
-			mat_addl(*((mat->val)+rt2),(mat->col),tmp);
+			memcpy(tmp,(mat->val)[rt],(mat->col));
+			mat_mull(tmp,(mat->col),(mat->val)[rt2][rt]);
+			mat_addl((mat->val)[rt2],(mat->col),tmp);
 		}
 		free(tmp);
 	}
 	for(int tr=(mat->col)-1;tr>=0;tr--) {
-		if(*(*((mat->val)+tr)+tr)==0) 
+		if((mat->val)[tr][tr]==0) 
 			continue;
 		double* tmp=malloc((mat->col)*sizeof(double));
 		for(int tr2=tr-1;tr2>=0;tr2--) {
-			memcpy(tmp,*((mat->val)+tr),(mat->col));
-			mat_mull(tmp,(mat->col),*(*((mat->val)+tr2)+tr));
-			mat_addl(*((mat->val)+tr2),(mat->col),tmp);
+			memcpy(tmp,(mat->val)[tr],(mat->col));
+			mat_mull(tmp,(mat->col),(mat->val)[tr2][tr]);
+			mat_addl((mat->val)[tr2],(mat->col),tmp);
 		}
 		free(tmp);
 	}
@@ -89,10 +89,10 @@ static mxp mat_solve_norm(mxp mat) {
  */
 static int mat_solvable(mxp mat) {
 	for(int rt=(mat->row);rt>=1;rt--) {
-		if(*(*((mat->val)+rt-1)+(mat->col)-1)==0) 
+		if((mat->val)[rt-1][(mat->col)-1]==0) 
 			continue;
 		for(int ct=0;ct<(mat->col)-1;ct++) 
-			if(*(*((mat->val)+rt-1)+ct)!=0) 
+			if((mat->val)[rt-1][ct]!=0) 
 				return 0;
 	}
 	return 1;
@@ -106,9 +106,9 @@ mxp mat_init() {
 	(mat->col)=2;
 	(mat->row)=1;
 	(mat->val)=malloc(sizeof(double*));
-	*(mat->val)=malloc(2*sizeof(double));
-	*(*((mat->val)))=0;
-	*(*((mat->val))+1)=0;
+	(mat->val)[0]=malloc(2*sizeof(double));
+	(mat->val)[0][0]=0;
+	(mat->val)[0][1]=0;
 	return mat;
 }
 
@@ -118,7 +118,7 @@ mxp mat_init() {
 void mat_destr(mxp mat) {
 	if(!(mat==NULL)) {
 		for(int rt=0;rt<(mat->row);rt++) 
-			free(*((mat->val)+rt));
+			free((mat->val)[rt]);
 		free(mat->val);
 		(mat->col)=0;
 		(mat->row)=0;
@@ -135,9 +135,9 @@ mxp mat_resize(mxp mat,int ncol,int nrow) {
 	if(!(ncol==-1 || ncol==(mat->col))) {
 		double* tmp=malloc(ncol*sizeof(double));
 		for(int rt=0;rt<(mat->row);rt++) {
-			memcpy(tmp,*((mat->val)+rt),((mat->col)>ncol?ncol:(mat->col)));
-			*((mat->val)+rt)=realloc(*((mat->val)+rt),ncol*sizeof(double));
-			memcpy(*((mat->val)+rt),tmp,ncol);
+			memcpy(tmp,(mat->val)[rt],((mat->col)>ncol?ncol:(mat->col)));
+			(mat->val)[rt]=realloc((mat->val)[rt],ncol*sizeof(double));
+			memcpy((mat->val)[rt],tmp,ncol);
 		}
 		(mat->col)=ncol;
 		free(tmp);
@@ -149,7 +149,7 @@ mxp mat_resize(mxp mat,int ncol,int nrow) {
 		memcpy((mat->val),tmp,nrow);
 		if(nrow>(mat->row))
 			for(int rt=(mat->row);rt<nrow;rt++) 
-				*((mat->val)+rt)=malloc((mat->col)*sizeof(double));
+				(mat->val)[rt]=malloc((mat->col)*sizeof(double));
 		(mat->row)=nrow;
 		free(tmp);
 	}
@@ -161,7 +161,7 @@ mxp mat_resize(mxp mat,int ncol,int nrow) {
  */
 double mat_get_val(mxp mat,int r,int c) {
 	if(r<=(mat->row) && c<=(mat->col) && r>=0 && c>=0)
-		return *(*((mat->val)+r)+c);
+		return (mat->val)[r][c];
 	return 1;
 }
 
@@ -170,7 +170,7 @@ double mat_get_val(mxp mat,int r,int c) {
  */
 void mat_set_val(mxp mat,int r,int c,double val) {
 	if(r<=(mat->row) && c<=(mat->col) && r>=0 && c>=0)
-		*(*((mat->val)+r)+c)=val;
+		(mat->val)[r][c]=val;
 }
 
 /*

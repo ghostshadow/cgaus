@@ -136,7 +136,8 @@ mxp mat_resize(mxp mat,int ncol,int nrow) {
 		double* tmp=malloc(ncol*sizeof(double));
 		for(int rt=0;rt<(mat->row);rt++) {
 			memcpy(tmp,(mat->val)[rt],((mat->col)>ncol?ncol:(mat->col)));
-			(mat->val)[rt]=realloc((mat->val)[rt],ncol*sizeof(double));
+			free((mat->val)[rt]);
+			(mat->val)[rt]=malloc(ncol*sizeof(double));
 			memcpy((mat->val)[rt],tmp,ncol);
 		}
 		(mat->col)=ncol;
@@ -144,8 +145,12 @@ mxp mat_resize(mxp mat,int ncol,int nrow) {
 	}
 	if(!(nrow==-1 || nrow==(mat->row))) {
 		double** tmp=malloc(nrow*sizeof(double*));
+		if(nrow<(mat->row))
+			for(int rt=nrow;rt<(mat->row);rt++)
+				free((mat->val)[rt]);
 		memcpy(tmp,(mat->val),((mat->row)>nrow?nrow:(mat->row)));
-		(mat->val)=realloc((mat->val),nrow*sizeof(double*));
+		free(mat->val);
+		(mat->val)=malloc(nrow*sizeof(double*));
 		memcpy((mat->val),tmp,nrow);
 		if(nrow>(mat->row))
 			for(int rt=(mat->row);rt<nrow;rt++) 

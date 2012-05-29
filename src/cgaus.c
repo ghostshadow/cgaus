@@ -5,6 +5,7 @@ void sif() {
 	sif_get_mat(mat);
 	mat_solve(mat);
 	sif_print_mat(mat);
+	mat_destr(mat);
 }
 
 int main(int argc, char** argv) {

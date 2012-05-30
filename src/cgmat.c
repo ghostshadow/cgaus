@@ -61,7 +61,7 @@ static int mat_swapl(mxp mat,int spos) {
  * but the rest zeros expect last column
  */
 static mxp mat_solve_norm(mxp mat) {
-	for(int rt=0;rt<(mat->col)-1;rt++) {
+	for(int rt=0;rt<((mat->col)-1<=(mat->row)?(mat->col)-1:(mat->row));rt++) {
 		if((mat->val)[rt][rt]==0) 
 			if(!mat_swapl(mat,rt+1)) 
 				continue;
@@ -70,20 +70,20 @@ static mxp mat_solve_norm(mxp mat) {
 		if(!(tmp=malloc((mat->col)*sizeof(double))))
 			REPOOM("tmp(1)@mat_solve_norm()");
 		for(int rt2=rt+1;rt2<(mat->row);rt2++) {
-			memcpy(tmp,(mat->val)[rt],(mat->col));
+			memcpy(tmp,(mat->val)[rt],(mat->col)*sizeof(double));
 			mat_mull(tmp,(mat->col),(mat->val)[rt2][rt]);
 			mat_addl((mat->val)[rt2],(mat->col),tmp);
 		}
 		free(tmp);
 	}
-	for(int tr=(mat->col)-1;tr>=0;tr--) {
+	for(int tr=((mat->col)-2<=(mat->row)-1?(mat->col)-2:(mat->row)-1);tr>=0;tr--) {
 		if((mat->val)[tr][tr]==0) 
 			continue;
 		double* tmp;
 		if(!(tmp=malloc((mat->col)*sizeof(double)))) 
 			REPOOM("tmp(2)@mat_solve_norm()");
 		for(int tr2=tr-1;tr2>=0;tr2--) {
-			memcpy(tmp,(mat->val)[tr],(mat->col));
+			memcpy(tmp,(mat->val)[tr],(mat->col)*sizeof(double));
 			mat_mull(tmp,(mat->col),(mat->val)[tr2][tr]);
 			mat_addl((mat->val)[tr2],(mat->col),tmp);
 		}
@@ -144,17 +144,17 @@ void mat_destr(mxp mat) {
  * -1 means no change here
  * warning: lastest numbers will be lost at srink
  */
-mxp mat_resize(mxp mat,int ncol,int nrow) {
+mxp mat_resize(mxp mat,int nrow,int ncol) {
 	if(!(ncol==-1 || ncol==(mat->col))) {
 		double* tmp;
 		if(!(tmp=malloc(ncol*sizeof(double))))
 			REPOOM("tmp(1)@mat_resize()");
 		for(int rt=0;rt<(mat->row);rt++) {
-			memcpy(tmp,(mat->val)[rt],((mat->col)>ncol?ncol:(mat->col)));
+			memcpy(tmp,(mat->val)[rt],((mat->col)>ncol?ncol:(mat->col))*sizeof(double));
 			free((mat->val)[rt]);
 			if(!((mat->val)[rt]=malloc(ncol*sizeof(double)))) 
 				REPOOMN("mat->val[rt]@mat_resize()",rt);
-			memcpy((mat->val)[rt],tmp,ncol);
+			memcpy((mat->val)[rt],tmp,ncol*sizeof(double));
 		}
 		(mat->col)=ncol;
 		free(tmp);
@@ -166,11 +166,11 @@ mxp mat_resize(mxp mat,int ncol,int nrow) {
 		if(nrow<(mat->row))
 			for(int rt=nrow;rt<(mat->row);rt++)
 				free((mat->val)[rt]);
-		memcpy(tmp,(mat->val),((mat->row)>nrow?nrow:(mat->row)));
+		memcpy(tmp,(mat->val),((mat->row)>nrow?nrow:(mat->row))*sizeof(double*));
 		free(mat->val);
 		if(!((mat->val)=malloc(nrow*sizeof(double*))))
 			REPOOM("mat->val@mat_resize()");
-		memcpy((mat->val),tmp,nrow);
+		memcpy((mat->val),tmp,nrow*sizeof(double*));
 		if(nrow>(mat->row))
 			for(int rt=(mat->row);rt<nrow;rt++) 
 				if(!((mat->val)[rt]=malloc((mat->col)*sizeof(double))))
@@ -185,7 +185,7 @@ mxp mat_resize(mxp mat,int ncol,int nrow) {
  * returns value at given position or 1 if fail
  */
 double mat_get_val(mxp mat,int r,int c) {
-	if(r<=(mat->row) && c<=(mat->col) && r>=0 && c>=0)
+	if(r<(mat->row) && c<(mat->col) && r>=0 && c>=0)
 		return (mat->val)[r][c];
 	return 1;
 }
@@ -194,7 +194,7 @@ double mat_get_val(mxp mat,int r,int c) {
  * sets the value of the given position to given number
  */
 void mat_set_val(mxp mat,int r,int c,double val) {
-	if(r<=(mat->row) && c<=(mat->col) && r>=0 && c>=0)
+	if(r<(mat->row) && c<(mat->col) && r>=0 && c>=0)
 		(mat->val)[r][c]=val;
 }
 

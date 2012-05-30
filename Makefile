@@ -1,7 +1,7 @@
 VPATH=src/
 OBJ=cgaus.o cgmat.o cgif.o
 CC=cc
-CFLAGS=-std=c99 -g
+CFLAGS=-std=c99
 
 all: cgaus
 

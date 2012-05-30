@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define REPOOM(x) {fprintf(stderr,"\n\nOut of memory: %s\n\n",x); abort();}
+#define REPOOMN(x,y) {fprintf(stderr,"\n\nOut of memory: %s; []=%d\n\n",x,y); abort();}
+
 struct mat {
 	double** val;
 	int col,row;
@@ -40,7 +43,9 @@ static void mat_addl(double* tline,int col,double* sline) {
  */
 static int mat_swapl(mxp mat,int spos) {
 	if((mat->val)[spos-1][spos-1]!=0) ; /*err?!*/
-	double* tmpp=(mat->val)[spos-1];
+	double* tmpp;
+	if(!(tmpp=(mat->val)[spos-1]))
+		REPOOM("tmpp@mat_swapl()")
 	for(int rt=spos;rt<(mat->row);rt++) {
 		if((mat->val)[rt][spos-1]==0)
 			continue;
@@ -61,7 +66,9 @@ static mxp mat_solve_norm(mxp mat) {
 			if(!mat_swapl(mat,rt+1)) 
 				continue;
 		mat_mull((mat->val)[rt],mat->col,-1/(mat->val)[rt][rt]);
-		double* tmp=malloc((mat->col)*sizeof(double));
+		double* tmp;
+		if(!(tmp=malloc((mat->col)*sizeof(double))))
+			REPOOM("tmp(1)@mat_solve_norm()");
 		for(int rt2=rt+1;rt2<(mat->row);rt2++) {
 			memcpy(tmp,(mat->val)[rt],(mat->col));
 			mat_mull(tmp,(mat->col),(mat->val)[rt2][rt]);
@@ -72,7 +79,9 @@ static mxp mat_solve_norm(mxp mat) {
 	for(int tr=(mat->col)-1;tr>=0;tr--) {
 		if((mat->val)[tr][tr]==0) 
 			continue;
-		double* tmp=malloc((mat->col)*sizeof(double));
+		double* tmp;
+		if(!(tmp=malloc((mat->col)*sizeof(double)))) 
+			REPOOM("tmp(2)@mat_solve_norm()");
 		for(int tr2=tr-1;tr2>=0;tr2--) {
 			memcpy(tmp,(mat->val)[tr],(mat->col));
 			mat_mull(tmp,(mat->col),(mat->val)[tr2][tr]);
@@ -102,11 +111,15 @@ static int mat_solvable(mxp mat) {
  * sets the matrix to minimum size of one row and two columns
  */
 mxp mat_init() {
-	mxp mat=malloc(sizeof(struct mat));
+	mxp mat;
+	if(!(mat=malloc(sizeof(struct mat))))
+		REPOOM("mat@mat_init()");
 	(mat->col)=2;
 	(mat->row)=1;
-	(mat->val)=malloc(sizeof(double*));
-	(mat->val)[0]=malloc(2*sizeof(double));
+	if(!((mat->val)=malloc(sizeof(double*))))
+		REPOOM("mat->val@mat_init()");
+	if(!((mat->val)[0]=malloc(2*sizeof(double))))
+		REPOOM("mat->val[0]@mat_init()");
 	(mat->val)[0][0]=0;
 	(mat->val)[0][1]=0;
 	return mat;
@@ -133,28 +146,35 @@ void mat_destr(mxp mat) {
  */
 mxp mat_resize(mxp mat,int ncol,int nrow) {
 	if(!(ncol==-1 || ncol==(mat->col))) {
-		double* tmp=malloc(ncol*sizeof(double));
+		double* tmp;
+		if(!(tmp=malloc(ncol*sizeof(double))))
+			REPOOM("tmp(1)@mat_resize()");
 		for(int rt=0;rt<(mat->row);rt++) {
 			memcpy(tmp,(mat->val)[rt],((mat->col)>ncol?ncol:(mat->col)));
 			free((mat->val)[rt]);
-			(mat->val)[rt]=malloc(ncol*sizeof(double));
+			if(!((mat->val)[rt]=malloc(ncol*sizeof(double)))) 
+				REPOOMN("mat->val[rt]@mat_resize()",rt);
 			memcpy((mat->val)[rt],tmp,ncol);
 		}
 		(mat->col)=ncol;
 		free(tmp);
 	}
 	if(!(nrow==-1 || nrow==(mat->row))) {
-		double** tmp=malloc(nrow*sizeof(double*));
+		double** tmp;
+		if(!(tmp=malloc(nrow*sizeof(double*))))
+			REPOOM("tmp(2)@mat_resize()");
 		if(nrow<(mat->row))
 			for(int rt=nrow;rt<(mat->row);rt++)
 				free((mat->val)[rt]);
 		memcpy(tmp,(mat->val),((mat->row)>nrow?nrow:(mat->row)));
 		free(mat->val);
-		(mat->val)=malloc(nrow*sizeof(double*));
+		if(!((mat->val)=malloc(nrow*sizeof(double*))))
+			REPOOM("mat->val@mat_resize()");
 		memcpy((mat->val),tmp,nrow);
 		if(nrow>(mat->row))
 			for(int rt=(mat->row);rt<nrow;rt++) 
-				(mat->val)[rt]=malloc((mat->col)*sizeof(double));
+				if(!((mat->val)[rt]=malloc((mat->col)*sizeof(double))))
+					REPOOMN("mat->val[rt]@mat_resize()",rt);
 		(mat->row)=nrow;
 		free(tmp);
 	}

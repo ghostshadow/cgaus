@@ -6,7 +6,7 @@ void sif() {
 	mxp mat=mat_init();
 	sif_get_mat(mat);
 	sif_print_mat(mat);
-	printf("\nMatrix is [%s]:\n\n",(mat_solve(mat)?"solvable":"not solvabel"));
+	printf("\nMatrix is [%s]:\n\n",(mat_solve(mat)?"solvable":"not solvable"));
 	sif_print_mat(mat);
 	mat_destr(mat);
 }

@@ -4,8 +4,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define REPOOM(x) {fprintf(stderr,"\n\nOut of memory: %s\n\n",x); abort();}
-#define REPOOMN(x,y) {fprintf(stderr,"\n\nOut of memory: %s; []=%d\n\n",x,y); abort();}
+static inline void REPOOM(char* x) {
+	fprintf(stderr,"\n\nOut of memory: %s\n\n",x); 
+	abort();
+}
+
+static inline void REPOOMN(char* x,int y) {
+	fprintf(stderr,"\n\nOut of memory: %s; []=%d\n\n",x,y); 
+	abort();
+}
 
 struct mat {
 	double** val;
@@ -45,7 +52,7 @@ static int mat_swapl(mxp mat,int spos) {
 	if((mat->val)[spos-1][spos-1]!=0) ; /*err?!*/
 	double* tmpp;
 	if(!(tmpp=(mat->val)[spos-1]))
-		REPOOM("tmpp@mat_swapl()")
+		REPOOM("tmpp@mat_swapl()");
 	for(int rt=spos;rt<(mat->row);rt++) {
 		if((mat->val)[rt][spos-1]==0)
 			continue;
@@ -193,7 +200,7 @@ mxp mat_resize(mxp mat,int nrow,int ncol) {
 double mat_get_val(mxp mat,int r,int c) {
 	if(r<(mat->row) && c<(mat->col) && r>=0 && c>=0)
 		return (mat->val)[r][c];
-	return 1;
+	return -0;
 }
 
 /*

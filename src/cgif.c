@@ -9,15 +9,19 @@
 
 void sif_get_mat(mxp mat) {
 	int r,c;
-	double tmp;
+	char *tpos=NULL;
+	char buffer[128];
 	printf("Input matrix size (<rows>x<columns>): ");
-	scanf("%dx%d",&r,&c);
+	fgets(&buffer[0],128,stdin);
+	r=strtol(&buffer[0],&tpos,10);
+	c=strtol(++tpos,&tpos,10);
 	mat_resize(mat,r,c);
 	for(int rt=0;rt<r;rt++) 
 		for(int ct=0;ct<c;ct++) {
+			memset(&buffer[0],0,128);
 			printf("Value of cell [%d;%d]: ",rt+1,ct+1);
-			scanf("%lf",&tmp);
-			mat_set_val(mat,rt,ct,tmp);
+			fgets(&buffer[0],128,stdin);
+			mat_set_val(mat,rt,ct,strtod(&buffer[0],NULL));
 		}
 	putchar('\n');
 }
@@ -47,7 +51,7 @@ int my=0,mx=0;
 		/*
 		 * longest line in help: 64
 		 * lines in help: 9
-		 */
+		*/
 
 static void nerrmsg(int y,int x,int colpair,char* errmsg) {
 	int my,mx;

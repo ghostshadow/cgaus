@@ -108,11 +108,10 @@ static int mat_solvable(mxp mat) {
 	for(int rt=(mat->row)-1;rt>=1;rt--) {
 		if((mat->val)[rt-1][(mat->col)-1]==0) 
 			continue;
-		lok=1;
+		lok=0;
 		for(int ct=0;ct<(mat->col)-2;ct++) {
 			if((mat->val)[rt-1][ct]!=0) 
-				continue;
-			lok=0;
+				lok=1;
 		}
 		if(!lok) 
 			return 0;

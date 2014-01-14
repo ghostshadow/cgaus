@@ -105,17 +105,17 @@ static mxp mat_solve_norm(mxp mat) {
  */
 static int mat_solvable(mxp mat) {
 	int lok=1;
-	for(int rt=(mat->row)-1;rt>=1;rt--) {
+	for(int rt=(mat->row);rt>=1;rt--) {
 		if((mat->val)[rt-1][(mat->col)-1]==0) 
 			continue;
 		lok=0;
-		for(int ct=0;ct<(mat->col)-2;ct++) {
+		for(int ct=0;ct<=(mat->col)-2;ct++) {
 			if((mat->val)[rt-1][ct]!=0) 
 				lok=1;
 		}
-		if(!lok) 
-			return 0;
 	}
+	if(!lok) 
+		return 0;
 	return 1;
 }
 

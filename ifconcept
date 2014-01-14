@@ -1,0 +1,23 @@
+<linear equation solver>(white,blue)
+<using gaus method>(white,blue)
+
+/         |         \
+| <value> | <value> |
+\         |         /
+
+(<^^>black,yellow)
+<helpinfo>(white,blue)
+<lastcommand>(white,blue)
+<usergenerated commands>(white,black)
+---------------------------------------------------------
+Commands:
+
+<enter|space>		=overwrite actuall cell
+<tap>			=calculate
+<cusors>		=move cell marker
+<a>[count]<l|c>		=add count lines|columns
+<d>[count]<l|c>		=delete count lines|columns
+<n>			=reset to standart matrix
+<q>			=quit
+<h>			=help
+

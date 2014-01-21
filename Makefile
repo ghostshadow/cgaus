@@ -1,8 +1,8 @@
 VPATH=src/
 OBJ=cgaus.o cgmat.o cgif.o
 CC=gcc
-CFLAGS=-std=c99 -g
-LFLAGS=-lncurses
+CFLAGS=-std=c99
+LFLAGS=
 
 all: cgaus
 

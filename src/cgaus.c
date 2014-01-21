@@ -13,10 +13,6 @@ void sif() {
 
 int main(int argc, char** argv) {
 	sif();
-	//init
-	//mainloop
-	//nif();
-	//bla
 	return 0;
 }
 
